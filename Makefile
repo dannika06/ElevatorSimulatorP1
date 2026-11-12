@@ -7,4 +7,4 @@ run:
 	$(PY) elevator.py
 
 test: all
-	./run_tests.sh
+	bash run_tests.sh
