@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 status=0
-for in in tests/input*.txt; do
-  n="${in##*/input}"          # "1.txt" from "tests/input1.txt"
+for in in testsP2/input*.txt; do
+  n="${in##*/input}"          # "1.txt" from "testsP2/input1.txt"
   n="${n%.txt}"               # "1"
-  expected="tests/output${n}.txt"
+  expected="testsP2/output${n}.txt"
   python3 elevator.py < "$in" > actual.out
   if diff actual.out "$expected" > /dev/null; then
     echo "PASS $in"
