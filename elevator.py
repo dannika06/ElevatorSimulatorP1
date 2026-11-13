@@ -83,7 +83,15 @@ def handle_moving(state, event, dest):
 
 def main():
     # TODO: read the input file, parse the events, and call the appropriate handler
-    pass
-
+    state, dest = State.IDLE_FLOOR1, None
+    for line in sys.stdin:
+        event = line.strip()
+        if not event:
+            continue
+        if state in (State.IDLE_FLOOR1, State.IDLE_FLOOR2, State.IDLE_FLOOR3):
+            state, dest = handle_idle(state, event, dest)
+        else:
+            state, dest = handle_moving(state, event, dest)
+            
 if __name__ == "__main__":
     main()
