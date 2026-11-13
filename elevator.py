@@ -27,7 +27,6 @@ def emit(*outputs):
         print(o)
 
 def handle_idle(state, event, dest):
-    # TODO: decide direction from the idle state and requested floor,
     # emit CLOSE_DOOR then the MOVE output, return (new_state, dest)
     if event in REQUESTS:
         requested_floor = REQUESTS[event]
@@ -58,19 +57,33 @@ def handle_moving(state, event, dest):
     # TODO: FAST -> SLOW on the right midpoint sensor
     # TODO: SLOW -> idle on the right floor sensor (STOP, OPEN_DOOR)
     # everything else is ignored
+    if state == State.MOVING_UP_FAST:
+        if (event == "BETWEEN_1_2" and dest == 2) or (event == "BETWEEN_2_3" and dest == 3):
+            emit("MOVE_UP_SLOW")
+            return State.MOVING_UP_SLOW, dest
+    elif state == State.MOVING_UP_SLOW:
+        if (event == "AT_FLOOR2" and dest == 2) or (event == "AT_FLOOR3" and dest == 3):
+            emit("STOP", "OPEN_DOOR")
+            if dest == 2:
+                return State.IDLE_FLOOR2, None
+            elif dest == 3:
+                return State.IDLE_FLOOR3, None
+    elif state == State.MOVING_DOWN_FAST:
+        if (event == "BETWEEN_1_2" and dest == 1) or (event == "BETWEEN_2_3" and dest == 2):
+            emit("MOVE_DOWN_SLOW")
+            return State.MOVING_DOWN_SLOW, dest
+    elif state == State.MOVING_DOWN_SLOW:
+        if (event == "AT_FLOOR1" and dest == 1) or (event == "AT_FLOOR2" and dest == 2):
+            emit("STOP", "OPEN_DOOR")
+            if dest == 1:
+                return State.IDLE_FLOOR1, None
+            elif dest == 2:
+                return State.IDLE_FLOOR2, None    
     return state, dest
 
 def main():
     # TODO: read the input file, parse the events, and call the appropriate handler
-    state, dest = State.IDLE_FLOOR1, None
-    for line in sys.stdin:
-        event = line.strip()
-        if not event:
-            continue
-        if state in (State.IDLE_FLOOR1, State.IDLE_FLOOR2, State.IDLE_FLOOR3):
-            state, dest = handle_idle(state, event, dest)
-        else:
-            state, dest = handle_moving(state, event, dest)
+    pass
 
 if __name__ == "__main__":
     main()
