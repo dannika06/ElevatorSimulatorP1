@@ -1,4 +1,4 @@
-Py ?= python3
+PY ?= python3
 
 all:
 	$(PY) -m py_compile elevator.py
