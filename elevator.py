@@ -27,7 +27,6 @@ def emit(*outputs):
         print(o)
 
 def handle_idle(state, event, dest):
-    # emit CLOSE_DOOR then the MOVE output, return (new_state, dest)
     if event in REQUESTS:
         requested_floor = REQUESTS[event]
         if state == State.IDLE_FLOOR1:
@@ -54,9 +53,6 @@ def handle_idle(state, event, dest):
     return state, dest
 
 def handle_moving(state, event, dest):
-    # TODO: FAST -> SLOW on the right midpoint sensor
-    # TODO: SLOW -> idle on the right floor sensor (STOP, OPEN_DOOR)
-    # everything else is ignored
     if state == State.MOVING_UP_FAST:
         if (event == "BETWEEN_1_2" and dest == 2) or (event == "BETWEEN_2_3" and dest == 3):
             emit("MOVE_UP_SLOW")
@@ -82,7 +78,6 @@ def handle_moving(state, event, dest):
     return state, dest
 
 def main():
-    # TODO: read the input file, parse the events, and call the appropriate handler
     state, dest = State.IDLE_FLOOR1, None
     for line in sys.stdin:
         event = line.strip()
