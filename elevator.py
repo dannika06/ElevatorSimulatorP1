@@ -2,12 +2,24 @@ import sys
 from enum import Enum, auto
 
 class State(Enum):
-    # TODO: add the states for the elevator
-    pass
+    # use auto() to automatically assign values to the states
+    IDLE_FLOOR1 = auto()
+    IDLE_FLOOR2 = auto()
+    IDLE_FLOOR3 = auto()
+    MOVING_UP_FAST = auto()
+    MOVING_UP_SLOW = auto()
+    MOVING_DOWN_FAST = auto()
+    MOVING_DOWN_SLOW = auto()
 
 # Map every button token to the floor it requests
 REQUESTS = {
-    # TODO: "FLOOR1_UP": 1, ...
+    "FLOOR1_UP": 1,
+    "FLOOR2_UP": 2,
+    "FLOOR2_DOWN": 2,
+    "FLOOR3_DOWN": 3,
+    "CAR_FLOOR1": 1,
+    "CAR_FLOOR2": 2,
+    "CAR_FLOOR3": 3,
 }
 
 def emit(*outputs):
