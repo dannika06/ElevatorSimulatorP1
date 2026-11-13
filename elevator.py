@@ -29,6 +29,29 @@ def emit(*outputs):
 def handle_idle(state, event, dest):
     # TODO: decide direction from the idle state and requested floor,
     # emit CLOSE_DOOR then the MOVE output, return (new_state, dest)
+    if event in REQUESTS:
+        requested_floor = REQUESTS[event]
+        if state == State.IDLE_FLOOR1:
+            if requested_floor == 2:
+                emit("CLOSE_DOOR", "MOVE_UP_FAST")
+                return State.MOVING_UP_FAST, 2
+            elif requested_floor == 3:
+                emit("CLOSE_DOOR", "MOVE_UP_FAST")
+                return State.MOVING_UP_FAST, 3
+        elif state == State.IDLE_FLOOR2:
+            if requested_floor == 1:
+                emit("CLOSE_DOOR", "MOVE_DOWN_FAST")
+                return State.MOVING_DOWN_FAST, 1
+            elif requested_floor == 3:
+                emit("CLOSE_DOOR", "MOVE_UP_FAST")
+                return State.MOVING_UP_FAST, 3
+        elif state == State.IDLE_FLOOR3:
+            if requested_floor == 1:
+                emit("CLOSE_DOOR", "MOVE_DOWN_FAST")
+                return State.MOVING_DOWN_FAST, 1
+            elif requested_floor == 2:
+                emit("CLOSE_DOOR", "MOVE_DOWN_FAST")
+                return State.MOVING_DOWN_FAST, 2
     return state, dest
 
 def handle_moving(state, event, dest):
@@ -39,7 +62,15 @@ def handle_moving(state, event, dest):
 
 def main():
     # TODO: read the input file, parse the events, and call the appropriate handler
-    pass
+    state, dest = State.IDLE_FLOOR1, None
+    for line in sys.stdin:
+        event = line.strip()
+        if not event:
+            continue
+        if state in (State.IDLE_FLOOR1, State.IDLE_FLOOR2, State.IDLE_FLOOR3):
+            state, dest = handle_idle(state, event, dest)
+        else:
+            state, dest = handle_moving(state, event, dest)
 
 if __name__ == "__main__":
     main()
