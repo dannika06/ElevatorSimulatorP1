@@ -72,7 +72,7 @@ def handle_moving(state, event, dest, pending):
         if (event == "AT_FLOOR2" and dest == 2) or (event == "AT_FLOOR3" and dest == 3):
             emit("STOP", "OPEN_DOOR")
             pending.discard(dest)         # this floor is now serviced
-            return arrive(dest, pending) 
+            return arrive(dest, pending, "UP") 
     elif state == State.MOVING_DOWN_FAST:
         if (event == "BETWEEN_1_2" and dest == 1) or (event == "BETWEEN_2_3" and dest == 2):
             emit("MOVE_DOWN_SLOW")
@@ -81,14 +81,14 @@ def handle_moving(state, event, dest, pending):
         if (event == "AT_FLOOR1" and dest == 1) or (event == "AT_FLOOR2" and dest == 2):
             emit("STOP", "OPEN_DOOR")
             pending.discard(dest)         # this floor is now serviced
-            return arrive(dest, pending)  
+            return arrive(dest, pending, "DOWN")  
     return state, dest, pending
 
-def arrive(floor, pending):
+def arrive(floor, pending, direction):
     if not pending:
         return IDLE_FOR_FLOOR[floor], None, pending
 
-    next_dest = choose_next(floor, pending)
+    next_dest = choose_next(floor, pending, direction)
     if next_dest > floor:
         emit("CLOSE_DOOR", "MOVE_UP_FAST")
         return State.MOVING_UP_FAST, next_dest, pending
@@ -97,10 +97,24 @@ def arrive(floor, pending):
         return State.MOVING_DOWN_FAST, next_dest, pending
 
 
-def choose_next(floor, pending):
-    # TODO: your rule. input2.txt shows that with floor 3 current and
-    # {2, 1} pending, the answer is 1.
-    ...
+def choose_next(floor, pending, direction):
+    # floor     = where the car just stopped (already removed from pending)
+    # pending   = floors still waiting; guaranteed non-empty here
+    # direction = "UP" or "DOWN", the way the car was just travelling
+
+    ahead = [f for f in pending if (direction == "UP" and f > floor) or (direction == "DOWN" and f < floor)]
+    behind = [f for f in pending if (direction == "UP" and f < floor) or (direction == "DOWN" and f > floor)]
+
+    if direction == "UP":
+        if ahead:
+            return min(ahead)
+        else:
+            return max(behind)
+    else:
+        if ahead:
+            return max(ahead)
+        else:
+            return min(behind)
 
 def main():
     state, dest, pending = State.IDLE_FLOOR1, None, set()
